@@ -2,6 +2,7 @@ const { model, Schema } = require("mongoose");
 const viajePasajeroSchema = new Schema({
   idPasajero: { type: Schema.Types.ObjectId, ref: "Pasajero" },
   idViaje: { type: Schema.Types.ObjectId, ref: "Viaje" },
+  cancelado: Boolean
 });
 const ViajePasajero = model("ViajePasajero", viajePasajeroSchema);
 viajePasajeroSchema.set("toJSON", {

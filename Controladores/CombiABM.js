@@ -1,4 +1,5 @@
 const Combi = require("../Modelos/Combi.js");
+const Ruta = require('../Modelos/Ruta') 
 
 const buscarCombiPorId = (req, res) => {
   const { id } = req.params;

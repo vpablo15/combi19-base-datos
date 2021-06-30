@@ -15,7 +15,7 @@ const agregarTarjeta = (req, res) => {
   const { numero, titular, vencimiento, codigo } = dataTarjeta;
   const nuevaTarjeta = new Tarjeta({
     numero,
-    provincia,
+    titular,
     vencimiento,
     codigo
   });
@@ -30,15 +30,9 @@ const modificarTarjeta = (req, res) => {
     if (!tarjetaActualizada) {
       res.status(404).end();
     }
-    const {  numero, titular, vencimiento, codigo } = tarjetaActualizada;
-    const tarjeta = {
-      numero,
-      titular,
-      vencimiento,
-      codigo,
-    };
-    Tarjeta.findByIdAndUpdate(id, tarjeta, { new: true }).then((result) => {
-      console.log(result);
+    console.log('id',id)
+    Tarjeta.findByIdAndUpdate(id, tarjetaActualizada, { new: true }).then((result) => {
+      console.log('resultado',result);
     });
   };
  

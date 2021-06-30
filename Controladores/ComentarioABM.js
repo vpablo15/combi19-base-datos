@@ -43,7 +43,6 @@ const listarComentarios = (req, res) => {
   Comentario.find({}).populate('pasajero').limit(10).then((dataComentarios) => {
     const result = dataComentarios.reverse()
     res.json(result);
-    console.log('result',result)
   });
 };
 

@@ -13,8 +13,7 @@ const agregarPasajero = (req, res) => {
   if (!dataPasajero) {
     return res.status(404).end();
   }
-  const { nombre, apellido, dni, mail, contraseña, fechaDeNacimiento, plan, tarjeta } =
-    dataPasajero;
+  const { nombre, apellido, dni, mail, contraseña, fechaDeNacimiento, plan, tarjeta } = dataPasajero;
   if(plan){
     const nuevaTarjeta = new Tarjeta(tarjeta)
     nuevaTarjeta.save().then(res => {
@@ -27,7 +26,6 @@ const agregarPasajero = (req, res) => {
         fechaDeNacimiento,
         plan,
         tarjeta:res._id,
-        viajes:[]
       });
       nuevoPasajero.save()
     })
@@ -40,32 +38,35 @@ const agregarPasajero = (req, res) => {
       contraseña,
       fechaDeNacimiento,
       plan,
-      viajes:[]
     });
     nuevoPasajero.save()
   }
 };
 
-const modificarPasajero = (req, res) => {
+const modificarPasajero = async(req, res) => {
   const { id } = req.params;
-  const pasajeroActualizado = req.body;
+  let pasajeroActualizado = req.body;
   if (!pasajeroActualizado) {
     res.status(404).end();
   }
-  const { nombre, apellido, dni, mail, contraseña, fechaDeNacimiento, plan, tarjeta } = pasajeroActualizado;
-  const pasajero = {
-    nombre,
-    apellido,
-    dni,
-    mail,
-    contraseña,
-    fechaDeNacimiento,
-    plan,
-    tarjeta,
-  };
-  Pasajero.findByIdAndUpdate(id, pasajero, { new: true }).then((result) => {
-    console.log(result);
-  });
+  
+  if(pasajeroActualizado.tarjeta !== undefined){
+    if(pasajeroActualizado.tarjeta === null){
+      const { tarjeta } = await Pasajero.findById(id)
+      await Tarjeta.findByIdAndDelete(tarjeta)
+    }else{
+      const nuevaTarjeta = new Tarjeta({
+        numero:pasajeroActualizado.tarjeta.numero,
+        titular:pasajeroActualizado.tarjeta.titular,
+        vencimiento:pasajeroActualizado.tarjeta.vencimiento,
+        codigo:pasajeroActualizado.tarjeta.codigo
+      })
+      const { _id } = await nuevaTarjeta.save()
+      pasajeroActualizado = {...pasajeroActualizado,tarjeta:_id}
+    }
+  }
+  const result = await Pasajero.findByIdAndUpdate(id, pasajeroActualizado, { new: true })
+  console.log('resultado:',result)
 };
 
 const borrarPasajero = (req, res) => {
@@ -76,7 +77,13 @@ const borrarPasajero = (req, res) => {
 };
 
 const listarPasajeros = (req, res) => {
-  Pasajero.find({})
+  Pasajero.find({}).populate("tarjeta",{
+    numero:1,
+    titular:1,
+    vencimiento:1,
+    codigo:1,
+    id:1
+  })
    .then((dataPasajero) => {
     res.json(dataPasajero);
   });
@@ -88,4 +95,4 @@ module.exports = {
   modificarPasajero,
   borrarPasajero,
   listarPasajeros,
-};
+}
